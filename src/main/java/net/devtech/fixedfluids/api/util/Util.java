@@ -1,5 +1,6 @@
 package net.devtech.fixedfluids.api.util;
 
+import static java.lang.Math.floorDiv;
 import static java.lang.Math.max;
 
 import java.util.Map;
@@ -9,15 +10,18 @@ import java.util.WeakHashMap;
 import net.devtech.fixedfluids.api.BlockParticipant;
 import net.devtech.fixedfluids.api.ItemParticipant;
 import net.devtech.fixedfluids.api.Participant;
+import net.devtech.fixedfluids.impl.CauldronParticipant;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldView;
+import net.minecraft.world.World;
 
 public class Util {
 	/**
@@ -32,6 +36,10 @@ public class Util {
 	 */
 	public static void register(Block block, BlockParticipant<?> participant) {
 		BLOCK_PARTICIPANT_MAP.put(block, participant);
+	}
+
+	static {
+		register(Blocks.CAULDRON, (BlockParticipant<Integer>) (state, world, pos, face) -> new CauldronParticipant(world, pos, state));
 	}
 
 	public static Participant<?> get(Participant<?> inventory, ItemStack stack) {
@@ -61,7 +69,7 @@ public class Util {
 		return null;
 	}
 
-	public static Participant<?> get(WorldView world, BlockPos pos, @Nullable Direction direction) {
+	public static Participant<?> get(World world, BlockPos pos, @Nullable Direction direction) {
 		Participant<?> participant = getNullable(world, pos, direction);
 		if (participant == null) {
 			return EmptyParticipant.INSTANCE;
@@ -69,11 +77,11 @@ public class Util {
 		return participant;
 	}
 
-	public static Optional<Participant<?>> getOptional(WorldView world, BlockPos pos, @Nullable Direction direction) {
+	public static Optional<Participant<?>> getOptional(World world, BlockPos pos, @Nullable Direction direction) {
 		return Optional.ofNullable(getNullable(world, pos, direction));
 	}
 
-	public static @Nullable Participant<?> getNullable(WorldView world, BlockPos pos, @Nullable Direction direction) {
+	public static @Nullable Participant<?> getNullable(World world, BlockPos pos, @Nullable Direction direction) {
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 		if (block instanceof BlockParticipant) {
@@ -87,10 +95,22 @@ public class Util {
 	}
 
 	/**
-	 * number of drops per bucket
+	 * number of drops per bucket, I'd recommend serializing quantities as fractions in the event I change this number
 	 */
 	public static final long ONE_BUCKET = 72;
 	public static final long ONE_THIRD = fraction(1, 3);
+
+	public static CompoundTag safeWrite(CompoundTag tag, long amount) {
+		tag.putLong("amount", amount);
+		tag.putLong("bucket", ONE_BUCKET);
+		return tag;
+	}
+
+	public static long safeRead(CompoundTag tag) {
+		long amount = tag.getLong("amount"), bucket = tag.getLong("bucket");
+		double ratio = ((double) ONE_BUCKET) / bucket;
+		return (long) (amount * ratio);
+	}
 
 	/**
 	 * [min, max]
@@ -99,20 +119,14 @@ public class Util {
 		return val > max ? max : max(val, min);
 	}
 
-	/**
-	 * if the participant doesn't do anything, then here's a utility function to return the right number
-	 */
-	public static long noOp(long amount) {
-		return amount > 0 ? amount : 0;
-	}
-
 	public static long fraction(long numerator, long denominator) {
 		long num = ONE_BUCKET * numerator;
-		if(num % denominator == 0) {
+		if (num % denominator == 0) {
 			return num / denominator;
 		}
 		throw new IllegalArgumentException("invalid fraction!");
 	}
+
 
 	private static final Map<Item, ItemParticipant<?>> ITEM_PARTICIPANT_MAP = new WeakHashMap<>();
 	private static final Map<Block, BlockParticipant<?>> BLOCK_PARTICIPANT_MAP = new WeakHashMap<>();

@@ -6,9 +6,15 @@ public enum EmptyParticipant implements Participant<Object> {
 	INSTANCE;
 
 	EmptyParticipant() {}
+
 	@Override
-	public long interact(Transaction transaction, Object type, long amount) {
-		return amount > 0 ? amount : 0;
+	public long take(Transaction transaction, Object type, long amount) {
+		return 0;
+	}
+
+	@Override
+	public long add(Transaction transaction, Object type, long amount) {
+		return amount;
 	}
 
 	@Override

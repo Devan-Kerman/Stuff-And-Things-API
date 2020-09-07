@@ -6,11 +6,6 @@
   "license": "CC0-1.0",
   "icon": "assets/fixedfluids/icon.png",
   "environment": "*",
-  "entrypoints": {
-    "main": [
-      "net.devtech.fixedfluids.Fixedfluids"
-    ]
-  },
   "mixins": [
     "fixedfluids.mixins.json"
   ],

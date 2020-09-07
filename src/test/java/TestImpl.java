@@ -20,6 +20,7 @@ public class TestImpl {
 		long amount = filled.interact(Fluids.WATER, -Util.ONE_BUCKET - 1, false);
 		System.out.println(Fluids.WATER + ": " + amount);
 		System.out.println(recording.record);
+
 	}
 
 	static final class Recording implements Participant<Object> {

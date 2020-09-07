@@ -2,13 +2,18 @@ package net.devtech.fixedfluids.api;
 
 
 import net.devtech.fixedfluids.api.util.Transaction;
+import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.stat.Stat;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.ItemStack;
 
 /**
  * a participant in a transaction
  *
  * @param <T> the data type (immutable)
+ * @see ItemWildcardParticipant
+ * @see FluidWildcardParticipant
  */
 public interface Participant<T> {
 	/**
@@ -31,6 +36,7 @@ public interface Participant<T> {
 			@Override
 			T copy(T data);
 		}
+
 		@Override
 		default void onCommit(T data) {}
 	}
@@ -49,37 +55,36 @@ public interface Participant<T> {
 			@Override
 			T copy(T data);
 		}
+
 		@Override
 		default void onAbort(T data) {}
 	}
 
 
-
 	/**
-	 * @deprecated only use for single transactions
-	 */
-	@Deprecated
-	default long interact(Object type, long amount, boolean simulate) {
-		Transaction transaction = new Transaction();
-		long val = this.interact(transaction, type, amount);
-		if (simulate) {
-			transaction.abort();
-		} else {
-			transaction.commit();
-		}
-		return val;
-	}
-
-	/**
-	 * take or add an amount of an object to the participant
+	 * take an amount of an object to the participant
 	 *
-	 * type: {@link net.minecraft.item.ItemStack} (amount must = 1), {@link net.minecraft.fluid.Fluid}, {@link net.minecraft.item.Item}
+	 * universal accepted types: {@link ItemStack} (amount must = 1), {@link Fluid}, {@link ItemConvertible}.
+	 * however you can pass whatever you want, and implement whatever you want.
+	 *
 	 * @param transaction the current transaction
 	 * @param type the type, may be ItemStack, Fluid, Item, etc.
-	 * @param amount the amount of that type to take or add (negative for take, positive for add)
-	 * @return if amount is positive, return amount of type leftover. else, amount of type actually taken
+	 * @param amount the amount of that type to take
+	 * @return the amount actually taken
 	 */
-	long interact(Transaction transaction, Object type, long amount);
+	long take(Transaction transaction, Object type, long amount);
+
+	/**
+	 * add an amount of an object to the participant
+	 *
+	 * default types: {@link ItemStack} (amount should be ignored in favor of amount), {@link Fluid}
+	 *
+	 * @param transaction the current transaction
+	 * @param type the type, may be ItemStack, Fluid, Item, etc.
+	 * @param amount the amount of that type to add
+	 * @return the amount leftover
+	 */
+	long add(Transaction transaction, Object type, long amount);
 
 	/**
 	 * called when any level transaction is aborted
@@ -94,13 +99,27 @@ public interface Participant<T> {
 	void onCommit(T data);
 
 	/**
-	 * assumes data type is immutable,
-	 * this is called when a child transaction's data is requested but it's only found on the parent, if you're reversion based and using a list
-	 * you should just create a new empty list
+	 * assumes data type is immutable, this is called when a child transaction's data is requested but it's only found on the parent, if you're reversion
+	 * based and using a list you should just create a new empty list
 	 *
 	 * @see Mut
 	 */
 	default T copy(T data) {
 		return data;
+	}
+
+	/**
+	 * if the type is of Item, returns a new ItemStack of that type, if type is of ItemStack it clones it and sets the amount
+	 */
+	@Nullable
+	static ItemStack of(Object type, long amount) {
+		if (type instanceof ItemConvertible) {
+			return new ItemStack(((ItemConvertible) type).asItem(), (int) Math.min(amount, Integer.MAX_VALUE));
+		} else if (type instanceof ItemStack) {
+			ItemStack clone = ((ItemStack) type).copy();
+			clone.setCount((int) Math.min(amount, Integer.MAX_VALUE));
+			return clone;
+		}
+		return null;
 	}
 }

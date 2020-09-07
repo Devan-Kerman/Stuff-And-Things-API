@@ -34,22 +34,25 @@ public abstract class AbstractEmptyBucketItemParticipant implements Participant.
 	public abstract Item of(Fluid fluid);
 
 	@Override
-	public long interact(Transaction transaction, Object type, long amount) {
+	public long add(Transaction transaction, Object type, long amount) {
 		if (!(type instanceof Fluid)) {
-			return amount > 0 ? amount : 0;
-		}
-		// can only fill empty buckets
-		long original = amount;
-		if (amount > 0) {
-			Integer count = transaction.getOrDefault(this, this.original.getCount());
-			amount = Math.min(floorDiv(amount, ONE_BUCKET), count);
-			amount = this.inventory.interact(transaction, this.of((Fluid) type), amount);
-			transaction.set(this, count + (int) amount);
-			return original - amount * ONE_BUCKET;
+			return amount;
 		}
 
+		// can only fill empty buckets
+		long original = amount;
+		Integer count = transaction.getOrDefault(this, this.original.getCount());
+		amount = Math.min(floorDiv(amount, ONE_BUCKET), count);
+		amount = this.inventory.add(transaction, this.of((Fluid) type), amount);
+		transaction.set(this, count + (int) amount);
+		return original - amount * ONE_BUCKET;
+	}
+
+	@Override
+	public long take(Transaction transaction, Object type, long amount) {
 		return 0;
 	}
+
 
 	@Override
 	public void onCommit(Integer data) {

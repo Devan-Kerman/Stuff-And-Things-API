@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import alexiil.mc.lib.attributes.Simulation;
 import net.devtech.fixedfluids.api.Participant;
 
 public class Transaction implements AutoCloseable {
