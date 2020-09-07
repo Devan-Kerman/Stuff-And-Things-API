@@ -17,35 +17,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldView;
 
-public class FluidUtil {
-	/**
-	 * number of drops per bucket
-	 */
-	public static final long DROPS = 72;
-	public static final long ONE_THIRD = fraction(1, 3);
-
-	public static long clamp(long val, long min, long max) {
-		return val > max ? max : max(val, min);
-	}
-
-	public static long fraction(long numerator, long denominator) {
-		long num = DROPS * numerator;
-		if(num % denominator == 0) {
-			return num / denominator;
-		}
-		throw new IllegalArgumentException("invalid fraction!");
-	}
-
-	private static final Map<Item, ItemParticipant<?>> ITEM_PARTICIPANT_MAP = new WeakHashMap<>();
-	private static final Map<Block, BlockParticipant<?>> BLOCK_PARTICIPANT_MAP = new WeakHashMap<>();
-
-	public static long floor(long val, long floor) {
-		return Math.floorDiv(val, floor) * floor;
-	}
-
+public class Util {
 	/**
 	 * for adding vanilla item compat without mixin
 	 */
@@ -110,5 +84,40 @@ public class FluidUtil {
 			return participant.get(state, world, pos, direction);
 		}
 		return null;
+	}
+
+	/**
+	 * number of drops per bucket
+	 */
+	public static final long ONE_BUCKET = 72;
+	public static final long ONE_THIRD = fraction(1, 3);
+
+	/**
+	 * [min, max]
+	 */
+	public static long clamp(long val, long min, long max) {
+		return val > max ? max : max(val, min);
+	}
+
+	/**
+	 * if the participant doesn't do anything, then here's a utility function to return the right number
+	 */
+	public static long noOp(long amount) {
+		return amount > 0 ? amount : 0;
+	}
+
+	public static long fraction(long numerator, long denominator) {
+		long num = ONE_BUCKET * numerator;
+		if(num % denominator == 0) {
+			return num / denominator;
+		}
+		throw new IllegalArgumentException("invalid fraction!");
+	}
+
+	private static final Map<Item, ItemParticipant<?>> ITEM_PARTICIPANT_MAP = new WeakHashMap<>();
+	private static final Map<Block, BlockParticipant<?>> BLOCK_PARTICIPANT_MAP = new WeakHashMap<>();
+
+	public static long floor(long val, long floor) {
+		return Math.floorDiv(val, floor) * floor;
 	}
 }

@@ -1,7 +1,8 @@
 package net.devtech.fixedfluids.impl;
 
 import static java.lang.Math.floorDiv;
-import static net.devtech.fixedfluids.api.util.FluidUtil.DROPS;
+import static net.devtech.fixedfluids.api.util.Util.ONE_BUCKET;
+import static net.devtech.fixedfluids.api.util.Util.noOp;
 
 import net.devtech.fixedfluids.api.Participant;
 import net.devtech.fixedfluids.api.util.Transaction;
@@ -41,19 +42,21 @@ public abstract class AbstractFilledBucketItemParticipant implements Participant
 	@Override
 	public long interact(Transaction transaction, Object type, long amount) {
 		if (type != this.fluid) {
-			return amount > 0 ? amount : 0;
+			return noOp(amount);
 		}
 
 		// can only be drained from
 		if (amount < 0) {
+			amount=-amount;
 			// emptying the stack
 			Integer count = transaction.getOrDefault(this, this.original.getCount());
 			// how much we can take out given the number of buckets
-			amount = Math.min(floorDiv(-amount, DROPS), count);
+			amount = Math.min(floorDiv(amount, ONE_BUCKET), count);
 			// the amount of empty buckets the inventory can actually take
-			amount = this.inventory.interact(transaction, this.empty(), amount);
+			if(amount == 0) return noOp(amount);
+			amount -= this.inventory.interact(transaction, this.empty(), amount);
 			transaction.set(this, count - (int)amount);
-			return amount * DROPS;
+			return amount * ONE_BUCKET;
 		}
 
 		return amount;

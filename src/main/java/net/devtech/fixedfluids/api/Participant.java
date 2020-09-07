@@ -3,6 +3,8 @@ package net.devtech.fixedfluids.api;
 
 import net.devtech.fixedfluids.api.util.Transaction;
 
+import net.minecraft.stat.Stat;
+
 /**
  * a participant in a transaction
  *
@@ -22,6 +24,13 @@ public interface Participant<T> {
 	 * abort is called. This means there is no use for onCommit, as the changes have already been reflected in the world.
 	 */
 	interface Reversion<T> extends Participant<T> {
+		/**
+		 * @param <T> a mutable type
+		 */
+		interface Mut<T> extends Reversion<T> {
+			@Override
+			T copy(T data);
+		}
 		@Override
 		default void onCommit(T data) {}
 	}
@@ -33,9 +42,18 @@ public interface Participant<T> {
 	 * mutable mirror of the participant is safely discarded.
 	 */
 	interface State<T> extends Participant<T> {
+		/**
+		 * @param <T> a mutable type
+		 */
+		interface Mut<T> extends State<T> {
+			@Override
+			T copy(T data);
+		}
 		@Override
 		default void onAbort(T data) {}
 	}
+
+
 
 	/**
 	 * @deprecated only use for single transactions
@@ -55,6 +73,7 @@ public interface Participant<T> {
 	/**
 	 * take or add an amount of an object to the participant
 	 *
+	 * type: {@link net.minecraft.item.ItemStack} (amount must = 1), {@link net.minecraft.fluid.Fluid}, {@link net.minecraft.item.Item}
 	 * @param transaction the current transaction
 	 * @param type the type, may be ItemStack, Fluid, Item, etc.
 	 * @param amount the amount of that type to take or add (negative for take, positive for add)
@@ -75,7 +94,9 @@ public interface Participant<T> {
 	void onCommit(T data);
 
 	/**
-	 * assumes data type is immutable
+	 * assumes data type is immutable,
+	 * this is called when a child transaction's data is requested but it's only found on the parent, if you're reversion based and using a list
+	 * you should just create a new empty list
 	 *
 	 * @see Mut
 	 */

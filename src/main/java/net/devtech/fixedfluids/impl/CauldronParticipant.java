@@ -1,11 +1,12 @@
 package net.devtech.fixedfluids.impl;
 
 import static java.lang.Math.floorDiv;
-import static net.devtech.fixedfluids.api.util.FluidUtil.clamp;
+import static net.devtech.fixedfluids.api.util.Util.clamp;
+import static net.devtech.fixedfluids.api.util.Util.noOp;
 
 import net.devtech.fixedfluids.api.Participant;
-import net.devtech.fixedfluids.api.util.FluidUtil;
 import net.devtech.fixedfluids.api.util.Transaction;
+import net.devtech.fixedfluids.api.util.Util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CauldronBlock;
@@ -25,11 +26,22 @@ public class CauldronParticipant implements Participant.State<Integer> {
 
 	@Override
 	public long interact(Transaction transaction, Object type, long amount) {
+		if ((int) amount != amount) {
+			return noOp(amount);
+		}
+
+		long orig = amount;
 		Integer count = transaction.getOrDefault(this, this.state.get(CauldronBlock.LEVEL));
-		amount = floorDiv(amount, FluidUtil.ONE_THIRD);
-		amount = clamp(amount, count, 3);
-		transaction.mutate(this, i -> i - finalAmount);
-		return finalAmount;
+		amount = floorDiv(amount, Util.ONE_THIRD);
+		amount += count;
+		amount = clamp(amount, 0, 3);
+		long finalAmount = amount;
+		transaction.mutate(this, i -> (int) finalAmount);
+		if (orig > 0) {
+			return orig - (finalAmount - count) * Util.ONE_THIRD;
+		} else {
+			return (count - finalAmount) * Util.ONE_THIRD;
+		}
 	}
 
 	@Override

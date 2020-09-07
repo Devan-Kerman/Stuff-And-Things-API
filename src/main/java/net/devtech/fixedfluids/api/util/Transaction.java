@@ -2,16 +2,18 @@ package net.devtech.fixedfluids.api.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import net.devtech.fixedfluids.api.Participant;
 
-public class Transaction {
+public class Transaction implements AutoCloseable {
 	private static final ThreadLocal<Transaction> TRANSACTIONS = new ThreadLocal<>();
 	private final Map<Participant<Object>, Object> state = new HashMap<>();
 	private final Transaction parent;
 	private final Thread thread;
 	private Transaction child;
+	private boolean invalidated;
 
 	public Transaction() {
 		Transaction parent = TRANSACTIONS.get();
@@ -31,7 +33,7 @@ public class Transaction {
 
 	public <T> T getOrDefault(Participant<T> participant, T data) {
 		T get = this.get(participant);
-		if(get == null) {
+		if (get == null) {
 			return data;
 		}
 		return get;
@@ -55,9 +57,9 @@ public class Transaction {
 	public <T> T get(Participant<T> participant) {
 		this.validateThread();
 		T val = (T) this.state.get(participant);
-		if(val == null && this.parent != null) {
+		if (val == null && this.parent != null) {
 			T parent = this.parent.get(participant);
-			if(parent != null) {
+			if (parent != null) {
 				parent = participant.copy(parent);
 				// in theory if we want to conserve memory, we should only copy/set if the type is mutable
 				// but I decided against it for the sake of simplicity.
@@ -66,6 +68,14 @@ public class Transaction {
 		}
 
 		return val;
+	}
+
+	public <T> T getOrCompute(Participant<T> participant, Supplier<T> val) {
+		T get = this.get(participant);
+		if (get == null) {
+			return val.get();
+		}
+		return get;
 	}
 
 	/**
@@ -79,6 +89,7 @@ public class Transaction {
 
 	public Transaction abort() {
 		this.validateThread();
+		this.invalidated = true;
 		TRANSACTIONS.set(this.parent);
 		if (this.child != null) {
 			throw new UnsupportedOperationException("You must finalize all child transactions before finalizing parents!");
@@ -94,13 +105,14 @@ public class Transaction {
 
 	public Transaction commit() {
 		this.validateThread();
+		this.invalidated = true;
 		TRANSACTIONS.set(this.parent);
 		if (this.child != null) {
 			throw new UnsupportedOperationException("You must finalize all child transactions before finalizing parents!");
 		}
 
 		// only when the parent commits, confirming and finalizing the transaction to we notify our listeners
-		if(this.parent == null) {
+		if (this.parent == null) {
 			this.state.forEach(Participant::onCommit);
 		} else { // otherwise we merge our state with the parent
 			this.parent.state.putAll(this.state);
@@ -117,12 +129,20 @@ public class Transaction {
 	 * ensures the transaction is occurring on the same thread it was created in.
 	 */
 	public void validateThread() {
-		if(Thread.currentThread() != this.thread) {
+		if (Thread.currentThread() != this.thread || this.invalidated) {
 			throw new UnsupportedOperationException("Transactions must begin, apply and end on the same thread!");
 		}
 	}
 
 	public boolean isTopLevel() {
 		return this.parent == null;
+	}
+
+	@Override
+	public void close() {
+		// if not aborted, commit
+		if(!this.invalidated) {
+			this.commit();
+		}
 	}
 }

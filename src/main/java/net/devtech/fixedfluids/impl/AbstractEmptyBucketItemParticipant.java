@@ -2,7 +2,7 @@ package net.devtech.fixedfluids.impl;
 
 
 import static java.lang.Math.floorDiv;
-import static net.devtech.fixedfluids.api.util.FluidUtil.DROPS;
+import static net.devtech.fixedfluids.api.util.Util.ONE_BUCKET;
 
 import net.devtech.fixedfluids.api.Participant;
 import net.devtech.fixedfluids.api.util.Transaction;
@@ -42,10 +42,10 @@ public abstract class AbstractEmptyBucketItemParticipant implements Participant.
 		long original = amount;
 		if (amount > 0) {
 			Integer count = transaction.getOrDefault(this, this.original.getCount());
-			amount = Math.min(floorDiv(amount, DROPS), count);
+			amount = Math.min(floorDiv(amount, ONE_BUCKET), count);
 			amount = this.inventory.interact(transaction, this.of((Fluid) type), amount);
 			transaction.set(this, count + (int) amount);
-			return original - amount * DROPS;
+			return original - amount * ONE_BUCKET;
 		}
 
 		return 0;
