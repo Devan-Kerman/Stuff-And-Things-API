@@ -9,10 +9,11 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import net.fabricmc.loader.api.FabricLoader;
 
-// todo add item compatibility with Inventories
+// todo BlockParticipant on InventoryProvider / SidedInventory
 public class Compatibility implements IMixinConfigPlugin {
 	public static final boolean LBA = FabricLoader.getInstance()
 	                                              .isModLoaded("libblockattributes");
+	// todo
 	public static final boolean FLUIDITY = FabricLoader.getInstance()
 	                                                   .isModLoaded("fluidity");
 

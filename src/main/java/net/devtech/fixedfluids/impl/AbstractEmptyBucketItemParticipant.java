@@ -2,7 +2,7 @@ package net.devtech.fixedfluids.impl;
 
 
 import static java.lang.Math.floorDiv;
-import static net.devtech.fixedfluids.api.util.Util.ONE_BUCKET;
+import static net.devtech.fixedfluids.api.util.FluidUtil.ONE_BUCKET;
 
 import net.devtech.fixedfluids.api.Participant;
 import net.devtech.fixedfluids.api.util.Transaction;

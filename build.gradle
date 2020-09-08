@@ -29,8 +29,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "alexiil.mc.lib:libblockattributes-all:0.7.0"
-    modImplementation ("grondag:fluidity-mc116:0.15.193") { transitive = false }
+    modCompileOnly "alexiil.mc.lib:libblockattributes-all:0.7.0"
+    modCompileOnly ("grondag:fluidity-mc116:0.15.193") { transitive = false }
 }
 
 processResources {
@@ -81,6 +81,13 @@ publishing {
 
     // select the repositories you want to publish to
     repositories {
+        File gh = new File(projectDir.parentFile.parentFile, "util/Devan-Repo")
+        System.out.println(gh)
+        if (gh.exists()) {
+            maven {
+                url = gh.absolutePath
+            }
+        }
         // uncomment to publish to the local maven
         // mavenLocal()
     }

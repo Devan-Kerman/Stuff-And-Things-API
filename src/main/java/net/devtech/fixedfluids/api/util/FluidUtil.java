@@ -1,6 +1,5 @@
 package net.devtech.fixedfluids.api.util;
 
-import static java.lang.Math.floorDiv;
 import static java.lang.Math.max;
 
 import java.util.Map;
@@ -23,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class Util {
+public class FluidUtil {
 	/**
 	 * for adding vanilla item compat without mixin
 	 */

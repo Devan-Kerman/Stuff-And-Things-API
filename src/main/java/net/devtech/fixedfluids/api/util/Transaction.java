@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 import alexiil.mc.lib.attributes.Simulation;
 import net.devtech.fixedfluids.api.Participant;
 
-public class Transaction implements AutoCloseable {
+public final class Transaction implements AutoCloseable {
 	private static final ThreadLocal<Transaction> TRANSACTIONS = new ThreadLocal<>();
 	private final Map<Participant<Object>, Object> state = new HashMap<>();
 	private final Transaction parent;

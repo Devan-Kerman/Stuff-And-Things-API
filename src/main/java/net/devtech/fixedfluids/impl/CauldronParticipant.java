@@ -1,7 +1,7 @@
 package net.devtech.fixedfluids.impl;
 
 import static java.lang.Math.floorDiv;
-import static net.devtech.fixedfluids.api.util.Util.ONE_THIRD;
+import static net.devtech.fixedfluids.api.util.FluidUtil.ONE_THIRD;
 
 import java.util.function.Predicate;
 

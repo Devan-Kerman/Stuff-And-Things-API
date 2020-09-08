@@ -4,7 +4,7 @@ import java.util.List;
 import com.mojang.datafixers.util.Pair;
 import net.devtech.fixedfluids.api.Participant;
 import net.devtech.fixedfluids.api.util.Transaction;
-import net.devtech.fixedfluids.api.util.Util;
+import net.devtech.fixedfluids.api.util.FluidUtil;
 import net.devtech.fixedfluids.impl.AbstractFilledBucketItemParticipant;
 
 import net.minecraft.Bootstrap;
@@ -17,7 +17,7 @@ public class TestImpl {
 		Bootstrap.initialize();
 		Recording recording = new Recording();
 		AbstractFilledBucketItemParticipant filled = new AbstractFilledBucketItemParticipant.Bucket(recording, new ItemStack(Items.WATER_BUCKET, 10), Fluids.WATER);
-		long amount = filled.interact(Fluids.WATER, -Util.ONE_BUCKET - 1, false);
+		long amount = filled.interact(Fluids.WATER, -FluidUtil.ONE_BUCKET - 1, false);
 		System.out.println(Fluids.WATER + ": " + amount);
 		System.out.println(recording.record);
 
