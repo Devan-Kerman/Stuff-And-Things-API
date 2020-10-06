@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "net.devtech.snt.internal.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "BucketItemMixin",
+    "InventoryMixin",
+    "InventoryProviderMixin",
+    "ItemStackMixin",
+    "access.BucketItemAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
