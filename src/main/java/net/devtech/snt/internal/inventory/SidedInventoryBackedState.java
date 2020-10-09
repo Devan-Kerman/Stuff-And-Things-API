@@ -56,7 +56,7 @@ public class SidedInventoryBackedState extends InventoryBackedState {
 	}
 
 	@Override
-	public Mutable<InventoryBackedState> copy() {
+	public InventoryBackedState copy() {
 		return new SidedInventoryBackedState(this);
 	}
 }

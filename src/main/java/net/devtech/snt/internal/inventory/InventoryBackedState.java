@@ -163,7 +163,7 @@ public class InventoryBackedState implements Inventory, Mutable<InventoryBackedS
 	}
 
 	@Override
-	public Mutable<InventoryBackedState> copy() {
+	public InventoryBackedState copy() {
 		return new InventoryBackedState(this);
 	}
 }

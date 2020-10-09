@@ -17,6 +17,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 
+/**
+ * adds compatibility to a BlockParticipantProvider with Mojang fluids
+ */
 public interface MojangFluidBlockParticipant<K extends WildParticipant<?>> extends FluidFillable, FluidDrainable, BlockParticipantProvider<K> {
 	@Override
 	default Fluid tryDrainFluid(WorldAccess world, BlockPos pos, BlockState state) {
@@ -37,10 +40,13 @@ public interface MojangFluidBlockParticipant<K extends WildParticipant<?>> exten
 
 	@Override
 	default boolean canFillWithFluid(BlockView world, BlockPos pos, BlockState state, Fluid fluid) {
-		Transaction transaction = new Transaction();
-		int leftOver = Participant.getParticipantAt(state, world, pos, null).take(transaction, fluid, FluidUtil.DENOMINATOR);
-		transaction.abort();
-		return leftOver == 0;
+		if(world instanceof WorldAccess) {
+			Transaction transaction = new Transaction();
+			int leftOver = Participant.getParticipantAt(state, (WorldAccess) world, pos, null).take(transaction, fluid, FluidUtil.DENOMINATOR);
+			transaction.abort();
+			return leftOver == 0;
+		}
+		return false;
 	}
 
 	@Override
