@@ -14,6 +14,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
@@ -22,8 +23,13 @@ import net.minecraft.world.WorldView;
 public interface InventoryProviderMixin extends BlockParticipantProvider {
 	@Shadow SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos);
 
+	@NotNull
 	@Override
-	default @NotNull Participant<?> getParticipant(@Nullable BlockEntity entity, BlockState state, WorldAccess world, BlockPos pos, @Nullable Direction direction) {
+	default Participant<?> getParticipant(@Nullable BlockEntity entity,
+			BlockState state,
+			WorldAccess world,
+			BlockPos pos,
+			@Nullable Direction direction) {
 		return InventoryUtil.getParticipant(this.getInventory(state, world, pos), direction);
 	}
 }

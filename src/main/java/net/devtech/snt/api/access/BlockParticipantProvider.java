@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.WorldAccess;
 
 /**
  * This must be implemented on the Block, not the BlockEntity.
@@ -24,5 +25,5 @@ public interface BlockParticipantProvider<T extends Participant<?>> {
 	 * @param direction the side to access it from, if null assume input inventory
 	 */
 	@NotNull
-	T getParticipant(@Nullable BlockEntity entity, BlockState state, BlockView world, BlockPos pos, @Nullable Direction direction);
+	T getParticipant(@Nullable BlockEntity entity, BlockState state, WorldAccess world, BlockPos pos, @Nullable Direction direction);
 }

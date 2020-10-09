@@ -60,7 +60,7 @@ public interface Participant<T> extends InternalParticipant {
 	 *
 	 * @return the participant at the given location, accessed from the given face
 	 */
-	static Participant<?> getParticipantAt(@NotNull BlockState state, BlockView world, BlockPos pos, @Nullable Direction direction) {
+	static Participant<?> getParticipantAt(@NotNull BlockState state, WorldAccess world, BlockPos pos, @Nullable Direction direction) {
 		if(state.getBlock().hasBlockEntity()) {
 			return getParticipantAt(world.getBlockEntity(pos), state, world, pos, direction);
 		}
@@ -72,7 +72,7 @@ public interface Participant<T> extends InternalParticipant {
 	 * @return the participant at the given location, accessed from the given face
 	 */
 	@NotNull
-	static Participant<?> getParticipantAt(@Nullable BlockEntity entity, BlockState state, BlockView world, BlockPos pos, @Nullable Direction direction) {
+	static Participant<?> getParticipantAt(@Nullable BlockEntity entity, BlockState state, WorldAccess world, BlockPos pos, @Nullable Direction direction) {
 		Block block = state.getBlock();
 		if(block instanceof BlockParticipantProvider) {
 			return ((BlockParticipantProvider)block).getParticipant(entity, state, world, pos, direction);
@@ -82,9 +82,9 @@ public interface Participant<T> extends InternalParticipant {
 			return (Participant<?>) entity;
 		}
 
-		if(world instanceof EntityView) {
+		if(world != null) {
 			int x = pos.getX(), y = pos.getY(), z = pos.getZ();
-			List<Entity> list = ((EntityView) world).getOtherEntities(null, new Box(x - 0.5D, y - 0.5D, z - 0.5D, x + 0.5D, y + 0.5D, z + 0.5D), e -> e instanceof EntityParticipantProvider);
+			List<Entity> list = world.getOtherEntities(null, new Box(x - 0.5D, y - 0.5D, z - 0.5D, x + 0.5D, y + 0.5D, z + 0.5D), e -> e instanceof EntityParticipantProvider);
 			for (Entity e : list) {
 				EntityParticipantProvider provider = (EntityParticipantProvider) e;
 				return provider.getParticipant(direction);

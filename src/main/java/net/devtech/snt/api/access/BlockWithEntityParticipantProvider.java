@@ -10,13 +10,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.WorldAccess;
 
 /**
  * implement Participant directly on your BlockEntity class
  */
 public interface BlockWithEntityParticipantProvider extends BlockParticipantProvider<Participant<?>> {
 	@Override
-	default @NotNull Participant<?> getParticipant(@Nullable BlockEntity entity, BlockState state, BlockView world, BlockPos pos, @Nullable Direction direction) {
+	default @NotNull Participant<?> getParticipant(@Nullable BlockEntity entity, BlockState state, WorldAccess world, BlockPos pos, @Nullable Direction direction) {
 		if (!this.getBlockEntityType().isInstance(entity)) {
 			entity = world.getBlockEntity(pos);
 		}
