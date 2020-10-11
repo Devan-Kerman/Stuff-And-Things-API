@@ -166,4 +166,5 @@ public class InventoryBackedState implements Inventory, Mutable<InventoryBackedS
 	public InventoryBackedState copy() {
 		return new InventoryBackedState(this);
 	}
+
 }

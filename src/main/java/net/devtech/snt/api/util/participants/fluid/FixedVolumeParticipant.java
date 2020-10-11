@@ -6,16 +6,19 @@ import com.google.common.collect.Iterators;
 import net.devtech.snt.api.util.data.Mutable;
 import net.devtech.snt.api.Participant;
 import net.devtech.snt.api.Transaction;
-import net.devtech.snt.api.RigidContainer;
-import net.devtech.snt.api.Supported;
-import net.devtech.snt.api.WildParticipant;
-import net.devtech.snt.api.util.data.Capacity;
+import net.devtech.snt.api.concrete.RigidContainer;
+import net.devtech.snt.api.concrete.Supported;
+import net.devtech.snt.api.concrete.WildParticipant;
+import net.devtech.snt.api.util.data.TypeSlot;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 
+/**
+ * it's a tank.
+ */
 public class FixedVolumeParticipant implements WildParticipant<FixedVolumeParticipant>, RigidContainer, Supported, Mutable<FixedVolumeParticipant> {
 	protected final int volume;
 	private Fluid fluid = Fluids.EMPTY;
@@ -84,8 +87,12 @@ public class FixedVolumeParticipant implements WildParticipant<FixedVolumePartic
 	}
 
 	@Override
-	public @NotNull Iterator<Capacity<?>> iterator() {
-		return Iterators.singletonIterator(Capacity.getFluid(this.fluid, this.amount, this.volume));
+	public @NotNull Iterator<TypeSlot<?>> iterator() {
+		return Iterators.singletonIterator(TypeSlot.getFluid(this.fluid, this.amount, this.volume));
+	}
+
+	public TypeSlot<Fluid> getCapacity() {
+		return TypeSlot.getFluid(this.fluid, this.amount, this.volume);
 	}
 
 	@Override

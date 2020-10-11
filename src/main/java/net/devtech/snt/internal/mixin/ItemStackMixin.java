@@ -1,6 +1,6 @@
 package net.devtech.snt.internal.mixin;
 
-import net.devtech.snt.api.util.data.Capacity;
+import net.devtech.snt.api.util.data.TypeSlot;
 import net.devtech.snt.api.util.data.Mutable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import net.minecraft.item.ItemStack;
 
 @Mixin (ItemStack.class)
-public abstract class ItemStackMixin implements Capacity<ItemStack>, Mutable {
+public abstract class ItemStackMixin implements TypeSlot<ItemStack>, Mutable {
 	@Shadow
 	public abstract int getMaxCount();
 

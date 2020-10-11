@@ -7,6 +7,9 @@ import org.jetbrains.annotations.Range;
 
 import net.minecraft.fluid.Fluid;
 
+/**
+ * it's a cauldron
+ */
 public class FixedVolumeFixedUnitParticipant extends FixedVolumeParticipant {
 	private final int unit;
 

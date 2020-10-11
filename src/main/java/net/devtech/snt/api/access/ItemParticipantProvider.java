@@ -19,11 +19,11 @@ public interface ItemParticipantProvider {
 	 * other when emptied.
 	 *
 	 * @param inventory a place for byproducts to go
-	 * @param direction the face to access the item from, just because a block is in item form, doesn't mean it looses it's shape.
+	 * @param face the face to access the item from, just because a block is in item form, doesn't mean it looses it's shape.
 	 * @return the inventory
 	 */
 	@NotNull
-	Participant<?> getParticipant(Participant<?> inventory, ItemStack stack, @Nullable Direction direction);
+	Participant<?> getParticipant(Participant<?> inventory, ItemStack stack, @Nullable Direction face);
 
 	@NotNull
 	default Participant<?> getParticipant(Participant<?> inventory, ItemStack stack) {

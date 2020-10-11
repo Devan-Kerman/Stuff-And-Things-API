@@ -4,14 +4,15 @@ import java.util.Iterator;
 
 import net.devtech.snt.api.Participant;
 import net.devtech.snt.api.Transaction;
-import net.devtech.snt.api.RigidContainer;
-import net.devtech.snt.api.Supported;
-import net.devtech.snt.api.WildParticipant;
+import net.devtech.snt.api.concrete.RigidContainer;
+import net.devtech.snt.api.concrete.Supported;
+import net.devtech.snt.api.concrete.WildParticipant;
+import net.devtech.snt.api.util.data.TypeSlot;
 import net.devtech.snt.internal.inventory.InventoryBackedState;
-import net.devtech.snt.api.util.data.Capacity;
-import net.devtech.snt.internal.inventory.InventoryCapacityIterator;
+import net.devtech.snt.internal.inventory.SidedInventoryParticipant;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -19,6 +20,8 @@ import net.minecraft.item.ItemStack;
 
 @Mixin(Inventory.class)
 public interface InventoryMixin extends WildParticipant<InventoryBackedState>, Supported, RigidContainer {
+	@Shadow void markDirty();
+
 	@Override
 	default void transfer(Transaction transaction, Participant<?> destination, int amount) {
 		if(!(destination instanceof Supported) || ((Supported) destination).isPushSupported(ItemStack.class)) {
@@ -47,11 +50,12 @@ public interface InventoryMixin extends WildParticipant<InventoryBackedState>, S
 	@Override
 	default void onCommit(InventoryBackedState obj) {
 		obj.copyTo((Inventory) this);
+		this.markDirty();
 	}
 
 	@Override
-	default @NotNull Iterator<Capacity<?>> iterator() {
-		return new InventoryCapacityIterator((Inventory) this);
+	default @NotNull Iterator<TypeSlot<?>> iterator() {
+		return new SidedInventoryParticipant.InventoryCapacityIterator((Inventory) this);
 	}
 
 	@Override

@@ -5,10 +5,10 @@ import java.util.function.Function;
 
 import net.devtech.snt.api.Participant;
 import net.devtech.snt.api.Transaction;
-import net.devtech.snt.api.RigidContainer;
-import net.devtech.snt.api.Supported;
-import net.devtech.snt.api.WildParticipant;
-import net.devtech.snt.api.util.data.Capacity;
+import net.devtech.snt.api.concrete.RigidContainer;
+import net.devtech.snt.api.concrete.Supported;
+import net.devtech.snt.api.concrete.WildParticipant;
+import net.devtech.snt.api.util.data.TypeSlot;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.inventory.Inventory;
@@ -18,8 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
 public class SidedInventoryParticipant implements WildParticipant<SidedInventoryBackedState>, Supported, RigidContainer {
-	private final Direction direction;
-	private final SidedInventory inventory;
+	protected final Direction direction;
+	protected final SidedInventory inventory;
 	public SidedInventoryParticipant(Direction direction, SidedInventory inventory) {
 		this.direction = direction;
 		this.inventory = inventory;
@@ -61,7 +61,7 @@ public class SidedInventoryParticipant implements WildParticipant<SidedInventory
 	}
 
 	@Override
-	public @NotNull Iterator<Capacity<?>> iterator() {
+	public @NotNull Iterator<TypeSlot<?>> iterator() {
 		return new InventoryCapacityIterator((Inventory) this);
 	}
 
@@ -86,5 +86,22 @@ public class SidedInventoryParticipant implements WildParticipant<SidedInventory
 
 	public static Function<SidedInventoryParticipant, SidedInventoryBackedState> get(Direction direction) {
 		return FUNCTIONS[direction.ordinal()];
+	}
+
+	public static class InventoryCapacityIterator implements Iterator<TypeSlot<?>> {
+		private final Inventory inventory;
+		private int i = 0;
+
+		public InventoryCapacityIterator(Inventory inventory) {this.inventory = inventory;}
+
+		@Override
+		public boolean hasNext() {
+			return this.i < this.inventory.size();
+		}
+
+		@Override
+		public TypeSlot<?> next() {
+			return TypeSlot.getItemStack(this.inventory, this.inventory.getStack(this.i++));
+		}
 	}
 }

@@ -1,28 +1,29 @@
-package net.devtech.snt.api.util.participants.fluid;
+package net.devtech.snt.internal.fluids;
 
 import java.util.Iterator;
 
 import com.google.common.collect.Iterators;
 import net.devtech.snt.api.Participant;
 import net.devtech.snt.api.Transaction;
-import net.devtech.snt.api.RigidContainer;
-import net.devtech.snt.api.Supported;
+import net.devtech.snt.api.concrete.RigidContainer;
+import net.devtech.snt.api.concrete.Supported;
 import net.devtech.snt.api.util.FluidUtil;
-import net.devtech.snt.api.util.data.Capacity;
-import net.devtech.snt.internal.access.BucketItemAccess;
+import net.devtech.snt.api.util.data.TypeSlot;
+import net.devtech.snt.internal.mixin.BucketItemAccess;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 public class BucketParticipant implements Participant<Integer>, Supported, RigidContainer {
 	private final BucketItemAccess access;
 	private final ItemStack stack;
 	private final Participant<?> output;
 
-	public BucketParticipant(ItemStack stack, Participant<?> output) {
+	public BucketParticipant(Participant<?> output, ItemStack stack) {
 		this.stack = stack;
 		this.output = output;
 		this.access = (BucketItemAccess) stack.getItem();
@@ -31,7 +32,7 @@ public class BucketParticipant implements Participant<Integer>, Supported, Rigid
 	@Override
 	public int take(Transaction transaction, Object type, int amount) {
 		if (this.access.getFluid() == type) {
-			return this.interact(transaction, this.access.getEmpty(), amount);
+			return this.interact(transaction, Items.BUCKET, amount);
 		}
 		return 0;
 	}
@@ -39,7 +40,7 @@ public class BucketParticipant implements Participant<Integer>, Supported, Rigid
 	@Override
 	public int push(Transaction transaction, Object type, int amount) {
 		if (this.isEmpty() && type instanceof Fluid) {
-			return this.interact(transaction, this.access.getFilled((Fluid) type), amount);
+			return this.interact(transaction, ((Fluid) type).getBucketItem(), amount);
 		}
 		return amount;
 	}
@@ -76,7 +77,7 @@ public class BucketParticipant implements Participant<Integer>, Supported, Rigid
 	}
 
 	@Override
-	public @NotNull Iterator<Capacity<?>> iterator() {
-		return Iterators.singletonIterator(Capacity.getItemStack(null, this.stack));
+	public @NotNull Iterator<TypeSlot<?>> iterator() {
+		return Iterators.singletonIterator(TypeSlot.getItemStack(null, this.stack));
 	}
 }

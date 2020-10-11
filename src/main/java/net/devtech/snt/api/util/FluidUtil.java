@@ -32,7 +32,7 @@ public class FluidUtil {
 	}
 
 	public static int floorToBucket(int drops) {
-		return floorDiv(drops, DENOMINATOR);
+		return floorDiv(drops, DENOMINATOR) * DENOMINATOR;
 	}
 
 	public static int exactFraction(int buckets, int divisor) throws ArithmeticException {

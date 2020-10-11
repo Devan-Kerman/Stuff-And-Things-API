@@ -3,11 +3,12 @@
   "package": "net.devtech.snt.internal.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "ArmorItemMixin",
+    "BucketItemAccess",
     "BucketItemMixin",
     "InventoryMixin",
     "InventoryProviderMixin",
-    "ItemStackMixin",
-    "access.BucketItemAccessor"
+    "ItemStackMixin"
   ],
   "client": [
   ],

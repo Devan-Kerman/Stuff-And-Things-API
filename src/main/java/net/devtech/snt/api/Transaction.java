@@ -1,6 +1,7 @@
 package net.devtech.snt.api;
 
 import java.util.Map;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -112,6 +113,17 @@ public final class Transaction implements AutoCloseable {
 		return newData;
 	}
 
+	/**
+	 * this is mutate but it gets passed an additional parameter to avoid needing to allocate a lambda object,
+	 * the info is the second parameter
+	 * @see #mutate(Participant, UnaryOperator)
+	 */
+	public <T> T mutate(Participant<T> participant, T info, BinaryOperator<T> data) {
+		T newData = data.apply(this.get(participant), info);
+		this.set(participant, newData);
+		return newData;
+	}
+
 	public <T extends Mutable<T>> T mutateMutable(Participant<T> participant, Consumer<T> data) {
 		T newData = this.get(participant);
 		data.accept(newData);
@@ -145,6 +157,7 @@ public final class Transaction implements AutoCloseable {
 		// only when the parent commits, confirming and finalizing the transaction to we notify our listeners
 		if (this.parent == null) {
 			this.state.forEach(Participant::onCommit);
+			this.state.forEach(Participant::postCommit);
 		} else { // otherwise we merge our state with the parent
 			this.parent.state.putAll(this.state);
 		}
