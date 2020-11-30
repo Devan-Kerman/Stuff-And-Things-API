@@ -12,6 +12,7 @@ group = project.maven_group
 
 minecraft {
 }
+
 repositories {
     maven {
         name = "BuildCraft"
@@ -23,6 +24,8 @@ repositories {
     }
 }
 
+
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -31,7 +34,9 @@ dependencies {
 
     modImplementation "alexiil.mc.lib:libblockattributes-all:0.7.0"
 }
-
+build.doLast {
+    println "Classpath = ${sourceSets.main.compileClasspath.asPath}"
+}
 processResources {
     inputs.property "version", project.version
 
