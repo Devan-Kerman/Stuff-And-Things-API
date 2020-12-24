@@ -1,6 +1,7 @@
-package net.devtech.snt.api.transactions.keys;
+package net.devtech.snt.v0.api.transactions.keys;
 
-import net.devtech.snt.api.transactions.Transaction;
+import net.devtech.snt.v0.api.transactions.Transaction;
+import org.jetbrains.annotations.Nullable;
 
 public interface Key<T> {
 	/**
@@ -55,6 +56,7 @@ public interface Key<T> {
 	 *
 	 * <b>DO NOT CALL THIS, ONLY IMPLEMENT</b>
 	 */
+	@Nullable
 	T get(Transaction transaction);
 
 	void commit(Transaction transaction);

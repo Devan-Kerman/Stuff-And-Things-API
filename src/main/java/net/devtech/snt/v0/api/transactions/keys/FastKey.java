@@ -1,9 +1,9 @@
-package net.devtech.snt.api.transactions.keys;
+package net.devtech.snt.v0.api.transactions.keys;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import net.devtech.snt.api.transactions.Transaction;
+import net.devtech.snt.v0.api.transactions.Transaction;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -11,12 +11,12 @@ import org.jetbrains.annotations.Nullable;
  * optimizing common cases. The only disadvantage is you need to store this object in a field, which is easy enough.
  */
 public class FastKey<T> implements Key<T> {
-	public interface Participant<T> extends net.devtech.snt.api.participants.Participant {
+	public interface Participant<T> extends net.devtech.snt.v0.api.participants.Participant {
 		/**
 		 * called when a top level transaction is aborted
 		 * @param val your data
 		 */
-		void commit(T val);
+		default void commit(T val) {}
 
 		/**
 		 * called when any level transaction is aborted
