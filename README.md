@@ -1,8 +1,5 @@
 Stuff n' Things API
 ---
-An api for moving stuff and things around (it's a fluid api)
-Docs
+**Discontinued in favor of astrarre-transfer-v0**
 ---
 https://github.com/Devan-Kerman/Stuff-And-Things-API/wiki
-# Things
-SNT refers to types as 'things', Item/Fluid/Energy
